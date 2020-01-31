@@ -7,15 +7,9 @@ const RegistrationSchema = new mongoose.Schema({
     required: [true, "name is required to register"],
     trim: true
   },
-  rollNumber: {
-    type: Number,
-    validate: {
-      validator: function(v) {
-        return /^\d{10}(\d{3})?$/.test(v);
-      },
-      message: props => `${props.value} is not a valid roll number!`
-    },
-    required: [true, "roll number is required"],
+  admissionNo: {
+    type: String,
+    required: [true, "admission number is required"],
     unique: true
   },
   mobile: {
