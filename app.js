@@ -4,6 +4,7 @@ var cors = require("cors");
 
 const AppError = require("./utils/appError");
 const globalErrorHandler = require("./controllers/errorController");
+const authRouter = require("./routes/authRoutes");
 const regRouter = require("./routes/regRoutes");
 
 const app = express();
@@ -17,6 +18,7 @@ app.use(cors());
 app.use(express.json());
 
 // ROUTES
+app.use("/api/v1/users", authRouter);
 app.use("/api/v1/reg", regRouter);
 
 app.all("*", (req, res, next) => {
