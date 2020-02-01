@@ -21,15 +21,22 @@ exports.createReg = catchAsync(async (req, res, next) => {
   });
 });
 
-exports.getReg = catchAsync(async (req, res, next) => {
-  const tour = await Tour.findById(req.params.id);
-  if (!tour) {
-    return next(AppError("No tour found with that id", 404));
+exports.searchRegPublic = catchAsync(async (req, res, next) => {
+  const tag = req.params.tag;
+  const registraions = await Registration.find({
+    $or: [
+      { admissionNo: tag },
+      { tempID: tag },
+      { mobile: Number(tag) || -1 },
+      { email: tag }
+    ]
+  }).select("name admissionNo email tempID zealID");
+  if (registraions.length == 0) {
+    return next(new AppError("No registration found with that tag", 404));
   }
-
   res.status(200).json({
     status: "success",
-    data: { tour }
+    data: { registraions }
   });
 });
 

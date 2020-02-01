@@ -9,8 +9,8 @@ router
   .post(regController.createReg);
 
 router
-  .route("/:id")
-  .get(regController.getReg)
+  .route("/:tag")
+  .get(regController.searchRegPublic)
   .patch(regController.updateReg)
   .delete(regController.delReg);
 

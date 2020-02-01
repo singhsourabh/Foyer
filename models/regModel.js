@@ -9,13 +9,15 @@ const RegistrationSchema = new mongoose.Schema({
   },
   admissionNo: {
     type: String,
-    required: [true, "admission number is required"],
-    unique: true
+    required: [true, "admission number is required"]
   },
   mobile: {
     type: String,
     required: [true, "mobile number is required"],
-    match: [/^\d{10}$/, "please enter a valid mobile number"],
+    match: [
+      /^(?:(?:\+|0{0,2})91(\s*[\ -]\s*)?|[0]?)?[6-9]\d{9}|(\d[ -]?){10}\d$/,
+      "please enter a valid mobile number"
+    ],
     unique: true
   },
   email: {
