@@ -1,9 +1,11 @@
 const dotenv = require("dotenv");
 const mongoose = require("mongoose");
+var cors = require("cors");
 
 dotenv.config({ path: "./.env" });
 
 const app = require("./app");
+app.use(cors());
 
 mongoose
   .connect(process.env.DB, {
