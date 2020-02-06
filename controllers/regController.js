@@ -58,6 +58,25 @@ exports.delReg = (req, res, next) => {
   });
 };
 
+exports.findReg = catchAsync(async (req, res, next) => {
+  const tag = req.params.tag;
+  const registraions = await Registration.find({
+    $or: [
+      { admissionNo: tag },
+      { tempID: tag },
+      { mobile: Number(tag) || -1 },
+      { email: tag }
+    ]
+  }).select("-paymentMode -approvedBy -_id -mobile -__v");
+  if (registraions.length == 0) {
+    return next(new AppError("No registration found with that tag", 404));
+  }
+  res.status(200).json({
+    status: "success",
+    data: { registraions }
+  });
+});
+
 exports.approveReg = catchAsync(async (req, res, next) => {
   const tempID = req.body.tempID;
   const zealCounter = await Counter.findById("zealID");
