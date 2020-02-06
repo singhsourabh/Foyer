@@ -9,7 +9,7 @@ router.post("/login", authController.login);
 
 router.use(authController.protect);
 
-router.use(authController.restrictTo("admin"));
+router.use(authController.restrictTo("admin", "core-team"));
 
 router.route("/").post(userController.createUser);
 

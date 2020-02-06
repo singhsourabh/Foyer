@@ -2,6 +2,7 @@ const Registration = require("./../models/regModel");
 const AppError = require("../utils/appError");
 const catchAsync = require("../utils/catchAsync");
 const restrict = require("./../utils/restrict");
+const Counter = require("./../models/counter");
 
 exports.getAllReg = (req, res, next) => {
   res.status(200).json({
@@ -13,6 +14,11 @@ exports.createReg = catchAsync(async (req, res, next) => {
   const data = restrict(req.body);
 
   const doc = await Registration.create(data);
+
+  doc.entryLog = undefined;
+  doc.zealID = undefined;
+  doc.paymentMode = undefined;
+
   res.status(200).json({
     status: "success",
     data: {
@@ -51,3 +57,29 @@ exports.delReg = (req, res, next) => {
     status: "Not implemented"
   });
 };
+
+exports.approveReg = catchAsync(async (req, res, next) => {
+  const tempID = req.body.tempID;
+  const zealCounter = await Counter.findById("zealID");
+
+  const registration = await Registration.findOneAndUpdate(
+    { tempID, approvedBy: null },
+    {
+      isPaid: true,
+      approvedBy: req.user,
+      zealID: zealCounter.seq,
+      paymentMode: "cash"
+    },
+    { new: true }
+  );
+
+  if (!registration) {
+    return next(new AppError("Invalid id or already approved", 400));
+  }
+  // called twice due to double update error
+  await Counter.findByIdAndUpdate("zealID", { $inc: { seq: 1 } });
+
+  res.status(200).json({
+    status: "success"
+  });
+});

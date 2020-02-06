@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const Counter = require("./counter");
+const validator = require("validator");
 
 const RegistrationSchema = new mongoose.Schema({
   name: {
@@ -14,19 +15,13 @@ const RegistrationSchema = new mongoose.Schema({
   mobile: {
     type: String,
     required: [true, "mobile number is required"],
-    match: [
-      /^(?:(?:\+|0{0,2})91(\s*[\ -]\s*)?|[0]?)?[6-9]\d{9}|(\d[ -]?){10}\d$/,
-      "please enter a valid mobile number"
-    ],
+    validate: [validator.isMobilePhone, "Please provide a valid mobile number"],
     unique: true
   },
   email: {
     type: String,
     required: [true, "email address is required"],
-    match: [
-      /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/,
-      "please enter a valid email address"
-    ],
+    validate: [validator.isEmail, "Please provide a valid email"],
     unique: true
   },
   tempID: {
@@ -45,6 +40,14 @@ const RegistrationSchema = new mongoose.Schema({
     type: String,
     enum: ["cash", "online", null],
     default: null
+  },
+  entryLog: {
+    type: Map
+  },
+  approvedBy: {
+    type: mongoose.Schema.ObjectId,
+    ref: "User",
+    default: null
   }
 });
 
@@ -58,6 +61,7 @@ RegistrationSchema.pre("save", function(next) {
       return next(error);
     }
     doc.tempID = counter.seq;
+    doc.entryLog = new Map();
     next();
   });
 });

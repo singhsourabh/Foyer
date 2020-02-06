@@ -17,6 +17,8 @@ if (process.env.NODE_ENV === "development") {
 app.use(cors());
 app.use(express.json());
 
+app.options("*", cors());
+
 // ROUTES
 app.use("/api/v1/users", authRouter);
 app.use("/api/v1/reg", regRouter);

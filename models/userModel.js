@@ -1,4 +1,3 @@
-const crypto = require("crypto");
 const mongoose = require("mongoose");
 const validator = require("validator");
 const bcrypt = require("bcryptjs");
@@ -30,7 +29,7 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: [true, "Please confirm your password"],
     validate: {
-      // This only works on CREATE and SAVE!!!
+      // This only works on CREATE and SAVE
       validator: function(el) {
         return el === this.password;
       },
@@ -41,6 +40,11 @@ const userSchema = new mongoose.Schema({
     type: Boolean,
     default: true,
     select: false
+  },
+  createdBy: {
+    type: mongoose.Schema.ObjectId,
+    ref: "User",
+    default: null
   }
 });
 
