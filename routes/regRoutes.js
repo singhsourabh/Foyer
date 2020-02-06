@@ -16,6 +16,14 @@ router
   .delete(regController.delReg);
 
 router
+  .route("/stat/all")
+  .get(
+    authController.protect,
+    authController.restrictTo("admin"),
+    regController.regStats
+  );
+
+router
   .route("/approve")
   .post(
     authController.protect,

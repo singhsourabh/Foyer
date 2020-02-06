@@ -1,4 +1,5 @@
 const Registration = require("./../models/regModel");
+const User = require("./../models/userModel");
 const AppError = require("../utils/appError");
 const catchAsync = require("../utils/catchAsync");
 const restrict = require("./../utils/restrict");
@@ -100,5 +101,24 @@ exports.approveReg = catchAsync(async (req, res, next) => {
 
   res.status(200).json({
     status: "success"
+  });
+});
+
+exports.regStats = catchAsync(async (req, res, next) => {
+  const stats = await User.find({ role: "core-team" });
+  let newStats = [];
+  for (i = 0; i < stats.length; i++) {
+    const reg = await Registration.find({ approvedBy: stats[i] });
+    newStats.push({
+      name: stats[i].name,
+      email: stats[i].email,
+      approved: reg.length
+    });
+  }
+  res.status(200).json({
+    status: "success",
+    data: {
+      newStats
+    }
   });
 });

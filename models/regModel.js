@@ -67,4 +67,5 @@ RegistrationSchema.pre("save", function(next) {
 });
 
 const Registration = mongoose.model("Registration", RegistrationSchema);
+
 module.exports = Registration;
