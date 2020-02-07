@@ -130,7 +130,7 @@ exports.createEntryLog = catchAsync(async (req, res, next) => {
   const registration = await Registration.findOne({
     $or: [{ zealID: tag }, { mobile: Number(tag) || -1 }, { email: tag }],
     zealID: { $ne: null }
-  }).select("name admissionNo email zealID entryLog");
+  }).select("name admissionNo email zealID entryLog tempID");
 
   if (!registration) {
     return next(new AppError("No valid registration found with that tag", 404));
@@ -140,7 +140,7 @@ exports.createEntryLog = catchAsync(async (req, res, next) => {
     createdAt: Date.now()
   });
   registration.save();
-
+  // registration.tempID = undefined;
   res.status(200).json({
     status: "success",
     data: {
