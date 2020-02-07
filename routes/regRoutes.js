@@ -31,12 +31,4 @@ router
     regController.approveReg
   );
 
-router
-  .route("/core/:tag")
-  .get(
-    authController.protect,
-    authController.restrictTo("core-team"),
-    regController.findReg
-  );
-
 module.exports = router;
