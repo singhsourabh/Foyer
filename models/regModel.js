@@ -60,8 +60,10 @@ RegistrationSchema.pre("save", function(next) {
     if (error) {
       return next(error);
     }
-    doc.tempID = counter.seq;
-    doc.entryLog = new Map();
+    if (!doc.tempID) {
+      doc.tempID = counter.seq;
+      doc.entryLog = new Map();
+    }
     next();
   });
 });

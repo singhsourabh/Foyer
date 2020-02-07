@@ -31,4 +31,16 @@ router
     regController.approveReg
   );
 
+router
+  .route("/management/:tag")
+  .get(
+    authController.protect,
+    authController.restrictTo("management"),
+    regController.entryStats
+  )
+  .post(
+    authController.protect,
+    authController.restrictTo("management"),
+    regController.createEntryLog
+  );
 module.exports = router;

@@ -4,6 +4,7 @@ const AppError = require("../utils/appError");
 const catchAsync = require("../utils/catchAsync");
 const restrict = require("./../utils/restrict");
 const Counter = require("./../models/counter");
+const getDay = require("../utils/getDay");
 
 exports.getAllReg = (req, res, next) => {
   res.status(200).json({
@@ -100,6 +101,43 @@ exports.regStats = catchAsync(async (req, res, next) => {
     status: "success",
     data: {
       newStats
+    }
+  });
+});
+
+exports.entryStats = catchAsync(async (req, res, next) => {
+  const tag = req.params.tag;
+  const registration = await Registration.find({
+    $or: [{ zealID: tag }, { mobile: Number(tag) || -1 }, { email: tag }]
+  }).select("name email zealID entryLog");
+  res.status(200).json({
+    status: "success",
+    data: {
+      registration
+    }
+  });
+});
+
+exports.createEntryLog = catchAsync(async (req, res, next) => {
+  const tag = req.params.tag;
+  const key = String(getDay());
+  const registration = await Registration.findOne({
+    $or: [{ zealID: tag }, { mobile: Number(tag) || -1 }, { email: tag }]
+  });
+
+  if (!registration) {
+    return next(new AppError("No registration found with that tag", 404));
+  }
+  registration.entryLog.set(String(key), {
+    createdBy: req.user._id,
+    createdAt: Date.now()
+  });
+  registration.save();
+
+  res.status(200).json({
+    status: "success",
+    data: {
+      registration
     }
   });
 });
