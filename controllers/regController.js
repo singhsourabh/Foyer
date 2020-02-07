@@ -107,9 +107,15 @@ exports.regStats = catchAsync(async (req, res, next) => {
 
 exports.entryStats = catchAsync(async (req, res, next) => {
   const tag = req.params.tag;
-  const registration = await Registration.find({
-    $or: [{ zealID: tag }, { mobile: Number(tag) || -1 }, { email: tag }]
-  }).select("name email zealID entryLog");
+  const registration = await Registration.findOne({
+    $or: [{ zealID: tag }, { mobile: Number(tag) || -1 }, { email: tag }],
+    zealID: { $ne: null }
+  }).select("name admissionNo email zealID entryLog");
+
+  if (!registration) {
+    return next(new AppError("No valid registration found with that tag", 404));
+  }
+
   res.status(200).json({
     status: "success",
     data: {
@@ -122,11 +128,12 @@ exports.createEntryLog = catchAsync(async (req, res, next) => {
   const tag = req.params.tag;
   const key = String(getDay());
   const registration = await Registration.findOne({
-    $or: [{ zealID: tag }, { mobile: Number(tag) || -1 }, { email: tag }]
-  });
+    $or: [{ zealID: tag }, { mobile: Number(tag) || -1 }, { email: tag }],
+    zealID: { $ne: null }
+  }).select("name admissionNo email zealID entryLog");
 
   if (!registration) {
-    return next(new AppError("No registration found with that tag", 404));
+    return next(new AppError("No valid registration found with that tag", 404));
   }
   registration.entryLog.set(String(key), {
     createdBy: req.user._id,
