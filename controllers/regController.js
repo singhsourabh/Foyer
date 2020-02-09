@@ -5,6 +5,7 @@ const catchAsync = require("../utils/catchAsync");
 const restrict = require("./../utils/restrict");
 const Counter = require("./../models/counter");
 const getDay = require("../utils/getDay");
+const mail = require("./../utils/email");
 
 exports.getAllReg = (req, res, next) => {
   res.status(200).json({
@@ -80,6 +81,8 @@ exports.approveReg = catchAsync(async (req, res, next) => {
   }
   // called twice due to double update error
   await Counter.findByIdAndUpdate("zealID", { $inc: { seq: 1 } });
+
+  mail(registration);
 
   res.status(200).json({
     status: "success"
