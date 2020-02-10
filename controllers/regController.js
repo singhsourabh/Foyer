@@ -97,13 +97,26 @@ exports.regStats = catchAsync(async (req, res, next) => {
     newStats.push({
       name: stats[i].name,
       email: stats[i].email,
-      approved: reg.length * process.env["TICKET_COST"]
+      amount: reg.length * process.env["TICKET_COST"]
     });
   }
   res.status(200).json({
     status: "success",
     data: {
       newStats
+    }
+  });
+});
+
+exports.coreStats = catchAsync(async (req, res, next) => {
+  const stats = await Registration.aggregate([
+    { $match: { approvedBy: req.user._id } },
+    { $group: { _id: null, amount: { $sum: 1 * process.env["TICKET_COST"] } } }
+  ]);
+  res.status(200).json({
+    status: "success",
+    data: {
+      stats
     }
   });
 });

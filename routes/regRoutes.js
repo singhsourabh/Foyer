@@ -32,6 +32,14 @@ router
   );
 
 router
+  .route("/stat/core")
+  .get(
+    authController.protect,
+    authController.restrictTo("core-team"),
+    regController.coreStats
+  );
+
+router
   .route("/management/:tag")
   .get(
     authController.protect,
