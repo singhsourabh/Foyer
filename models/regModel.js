@@ -15,7 +15,10 @@ const RegistrationSchema = new mongoose.Schema({
   mobile: {
     type: String,
     required: [true, "mobile number is required"],
-    validate: [validator.isMobilePhone, "Please provide a valid mobile number"],
+    validate: [
+      str => validator.isMobilePhone(str, "en-IN"),
+      "Please provide a valid mobile number"
+    ],
     unique: true
   },
   email: {

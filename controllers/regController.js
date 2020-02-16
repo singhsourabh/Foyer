@@ -6,6 +6,7 @@ const restrict = require("./../utils/restrict");
 const Counter = require("./../models/counter");
 const getDay = require("../utils/getDay");
 const mail = require("./../utils/email");
+const axios = require("axios");
 
 exports.getAllReg = (req, res, next) => {
   res.status(200).json({
@@ -15,12 +16,26 @@ exports.getAllReg = (req, res, next) => {
 
 exports.createReg = catchAsync(async (req, res, next) => {
   const data = restrict(req.body);
+  // to avoid captcha during testing
+  if (process.env.NODE_ENV != "test") {
+    if (!data.token) {
+      return next(new AppError("Capctha is not checked", 400));
+    }
+    const verifyUrl = `https://www.google.com/recaptcha/api/siteverify?secret=${process.env.SECRET_KEY}&response=${data.token}`;
+    const response = await axios.post(verifyUrl);
+    if (!response.success && response.success === undefined) {
+      return next(new AppError("Captcha verification failed", 400));
+    } else if (body.score < 0.7) {
+      return next(new AppError("You might be a bot, sorry!", 400));
+    }
+  }
 
   const doc = await Registration.create(data);
 
   doc.entryLog = undefined;
   doc.zealID = undefined;
   doc.paymentMode = undefined;
+  doc.approvedBy = undefined;
 
   res.status(200).json({
     status: "success",
