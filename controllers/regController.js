@@ -97,10 +97,15 @@ exports.approveReg = catchAsync(async (req, res, next) => {
   // called twice due to double update error
   await Counter.findByIdAndUpdate("zealID", { $inc: { seq: 1 } });
 
-  mail(registration);
+  if (process.env.NODE_ENV != "test") {
+    mail(registration);
+  }
 
   res.status(200).json({
-    status: "success"
+    status: "success",
+    data: {
+      zealID: zealCounter.seq
+    }
   });
 });
 

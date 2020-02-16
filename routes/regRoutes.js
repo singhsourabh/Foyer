@@ -4,10 +4,7 @@ const authController = require("./../controllers/authController");
 
 const router = express.Router();
 
-router
-  .route("/")
-  .get(regController.getAllReg)
-  .post(regController.createReg);
+router.route("/").post(regController.createReg);
 
 router
   .route("/:tag")

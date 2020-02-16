@@ -21,7 +21,7 @@ module.exports = (err, req, res, next) => {
   // console.log(err);
   err.statusCode = err.statusCode || 500;
   err.status = err.status || "error";
-  console.log(err);
+  // console.log(err);
   let error = { ...err };
   if (error.name === "CastError") error = handleCastErrorDB(error);
   if (error.code === 11000) error = handleDuplicateFieldsDB(error);
@@ -34,7 +34,7 @@ module.exports = (err, req, res, next) => {
       message: error.message || err.message
     });
   } else {
-    console.error("ERROR... ", error);
+    // console.error("ERROR... ", error);
     res.status(500).json({
       status: "error",
       message: "Something went very wrong!"
