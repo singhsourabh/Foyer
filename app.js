@@ -22,7 +22,7 @@ app.use(cors());
 app.options("*", cors());
 
 const limiter = rateLimit({
-  max: process.env.MAX_LIMIT,
+  max: process.env.MAX_LIMIT || 100,
   windowMs: 60 * 1000,
   message: "too many request please try again in few minutes"
 });
