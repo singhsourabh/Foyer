@@ -35,6 +35,9 @@
   },
   "jest": {
     "testEnvironment": "node",
+    "setupFiles": [
+      "/home/sourabh/node/foyer/tests/testenv.js"
+    ],
     "coveragePathIgnorePatterns": [
       "/node_modules/"
     ]

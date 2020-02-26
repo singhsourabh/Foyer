@@ -1,13 +1,11 @@
 const Registration = require("./../models/regModel");
 const User = require("./../models/userModel");
-const Team = require("./../models/teamModel");
 const AppError = require("../utils/appError");
 const catchAsync = require("../utils/catchAsync");
 const restrict = require("./../utils/restrict");
 const Counter = require("./../models/counter");
 const getDay = require("../utils/getDay");
 const mail = require("./../utils/email");
-const axios = require("axios");
 
 exports.getAllReg = (req, res, next) => {
   res.status(200).json({
@@ -17,20 +15,6 @@ exports.getAllReg = (req, res, next) => {
 
 exports.createReg = catchAsync(async (req, res, next) => {
   const data = restrict(req.body);
-  // to avoid captcha during testing
-  if (process.env.NODE_ENV != "test") {
-    if (!data.token) {
-      return next(new AppError("Capctha is not checked", 400));
-    }
-    const verifyUrl = `https://www.google.com/recaptcha/api/siteverify?secret=${process.env.SECRET_KEY}&response=${data.token}`;
-    const response = await axios.post(verifyUrl);
-
-    if (!response.data.success && response.data.success === undefined) {
-      return next(new AppError("Captcha verification failed", 400));
-    } else if (response.data.score < 0.7) {
-      return next(new AppError("You might be a bot, sorry!", 400));
-    }
-  }
 
   const doc = await Registration.create(data);
 
@@ -38,6 +22,7 @@ exports.createReg = catchAsync(async (req, res, next) => {
   doc.zealID = undefined;
   doc.paymentMode = undefined;
   doc.approvedBy = undefined;
+  doc.approvedAt = undefined;
   doc.team = undefined;
 
   res.status(200).json({
@@ -49,7 +34,7 @@ exports.createReg = catchAsync(async (req, res, next) => {
 });
 
 exports.searchRegPublic = catchAsync(async (req, res, next) => {
-  const tag = req.params.tag;
+  const tag = req.query.tag;
   const registraions = await Registration.find({
     $or: [
       { admissionNo: tag },

@@ -4,7 +4,7 @@ const path = require("path");
 const dbHandler = require("./db-handler");
 const assert = require("assert");
 
-dotenv.config({ path: path.resolve(__dirname, "./../.env") });
+// dotenv.config({ path: path.resolve(__dirname, "./../.env") });
 const app = require("../app");
 const supertest = require("supertest");
 const request = supertest(app);
@@ -19,6 +19,7 @@ let adminToken, coreToken, manageToken, tempID, zealID, logDay;
 
 describe("Registration", () => {
   it("Create registration", async done => {
+    console.log(process.env);
     await request
       .post("/api/v1/reg")
       .send({
@@ -128,17 +129,17 @@ describe("Approve registration", () => {
 
 describe("Registration", () => {
   it("Search wrong registration", async done => {
-    await request.get("/api/v1/reg/random").expect(404);
+    await request.get("/api/v1/reg/search/?tag=random").expect(404);
     done();
   });
 
   it("Search registration by admission no", async done => {
-    await request.get("/api/v1/reg/17cse001").expect(200);
+    await request.get("/api/v1/reg/search/?tag=17cse001").expect(200);
     done();
   });
 
   it("Search registration by tempID", async done => {
-    await request.get(`/api/v1/reg/${tempID}`).expect(200);
+    await request.get(`/api/v1/reg/search/?tag=${tempID}`).expect(200);
     done();
   });
 });

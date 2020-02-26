@@ -1,4 +1,5 @@
 const crypto = require("crypto");
+const axios = require("axios");
 const { promisify } = require("util");
 const jwt = require("jsonwebtoken");
 const User = require("./../models/userModel");
@@ -93,3 +94,26 @@ exports.restrictTo = (...roles) => {
     next();
   };
 };
+
+exports.restrictBot = catchAsync(async (req, res, next) => {
+  // to avoid captcha during testing
+  const device = req.header("device") || "web";
+  if (process.env.NODE_ENV != "test") {
+    if (!req.body.token) {
+      return next(new AppError("Capctha is not checked", 400));
+    }
+    const secret =
+      device == "android"
+        ? process.env.SECRET_KEY_V2
+        : process.env.SECRET_KEY_V3;
+    const verifyUrl = `https://www.google.com/recaptcha/api/siteverify?secret=${secret}&response=${req.body.token}`;
+    const response = await axios.post(verifyUrl);
+
+    if (!response.data.success || response.data.success === undefined) {
+      return next(new AppError("Captcha verification failed", 400));
+    } else if (response.data.score < 0.7) {
+      return next(new AppError("You might be a bot, sorry!", 400));
+    }
+  }
+  next();
+});
