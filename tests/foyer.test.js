@@ -19,7 +19,6 @@ let adminToken, coreToken, manageToken, tempID, zealID, logDay;
 
 describe("Registration", () => {
   it("Create registration", async done => {
-    console.log(process.env);
     await request
       .post("/api/v1/reg")
       .send({

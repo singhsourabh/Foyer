@@ -4,13 +4,9 @@ const authController = require("./../controllers/authController");
 
 const router = express.Router();
 
-router.route("/").post(regController.createReg);
+router.route("/").post(authController.restrictBot, regController.createReg);
 
-router
-  .route("/:tag")
-  .get(regController.searchRegPublic)
-  .patch(regController.updateReg)
-  .delete(regController.delReg);
+router.route("/search").get(regController.searchRegPublic);
 
 router
   .route("/stat/all")
