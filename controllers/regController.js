@@ -1,5 +1,6 @@
 const Registration = require("./../models/regModel");
 const User = require("./../models/userModel");
+const Team = require("./../models/teamModel");
 const AppError = require("../utils/appError");
 const catchAsync = require("../utils/catchAsync");
 const restrict = require("./../utils/restrict");
@@ -37,6 +38,7 @@ exports.createReg = catchAsync(async (req, res, next) => {
   doc.zealID = undefined;
   doc.paymentMode = undefined;
   doc.approvedBy = undefined;
+  doc.team = undefined;
 
   res.status(200).json({
     status: "success",
@@ -86,6 +88,7 @@ exports.approveReg = catchAsync(async (req, res, next) => {
     {
       isPaid: true,
       approvedBy: req.user,
+      approvedAt: Date.now(),
       zealID: zealCounter.seq,
       paymentMode: "cash"
     },
@@ -110,15 +113,51 @@ exports.approveReg = catchAsync(async (req, res, next) => {
   });
 });
 
+exports.createTeamReg = catchAsync(async (req, res, next) => {
+  const data = restrict(req.body);
+  const zealCounter = await Counter.findById("zealTeamID");
+
+  const registration = await Registration.create({
+    ...data,
+    type: "team",
+    isPaid: true,
+    approvedBy: req.user,
+    approvedAt: Date.now(),
+    zealID: zealCounter.seq,
+    paymentMode: "cash"
+  });
+
+  // called twice due to double update error
+  await Counter.findByIdAndUpdate("zealTeamID", { $inc: { seq: 1 } });
+
+  if (process.env.NODE_ENV != "test") {
+    mail(registration);
+  }
+
+  res.status(200).json({
+    status: "success",
+    data: {
+      zealID: zealCounter.seq
+    }
+  });
+});
+
 exports.regStats = catchAsync(async (req, res, next) => {
   const stats = await User.find({ role: "core-team" });
   let newStats = [];
   for (i = 0; i < stats.length; i++) {
-    const reg = await Registration.find({ approvedBy: stats[i] });
+    const reg = await Registration.find({ approvedBy: stats[i], type: "solo" });
+    const teamReg = await Registration.find({
+      approvedBy: stats[i],
+      type: "team"
+    });
+
     newStats.push({
       name: stats[i].name,
       email: stats[i].email,
-      amount: reg.length * process.env["TICKET_COST"]
+      amount:
+        reg.length * process.env["TICKET_COST"] +
+        teamReg.length * process.env["TEAM_TICKET_COST"]
     });
   }
   res.status(200).json({
@@ -132,7 +171,20 @@ exports.regStats = catchAsync(async (req, res, next) => {
 exports.coreStats = catchAsync(async (req, res, next) => {
   const stats = await Registration.aggregate([
     { $match: { approvedBy: req.user._id } },
-    { $group: { _id: null, amount: { $sum: 1 * process.env["TICKET_COST"] } } }
+    {
+      $group: {
+        _id: "$type",
+        amount: {
+          $sum: {
+            $cond: {
+              if: { $eq: ["$type", "team"] },
+              then: 1 * process.env["TEAM_TICKET_COST"],
+              else: 1 * process.env["TICKET_COST"]
+            }
+          }
+        }
+      }
+    }
   ]);
   res.status(200).json({
     status: "success",

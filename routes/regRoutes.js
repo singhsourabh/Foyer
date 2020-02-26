@@ -29,6 +29,14 @@ router
   );
 
 router
+  .route("/teamreg")
+  .post(
+    authController.protect,
+    authController.restrictTo("core-team"),
+    regController.createTeamReg
+  );
+
+router
   .route("/stat/core")
   .get(
     authController.protect,

@@ -1,4 +1,8 @@
 module.exports = data => {
-  ["zealID", "isPaid", "paymentMode"].forEach(e => delete data[e]);
-  return data;
+  return (({ name, email, admissionNo, mobile }) => ({
+    name,
+    email,
+    admissionNo,
+    mobile
+  }))(data);
 };

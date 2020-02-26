@@ -13,9 +13,9 @@ mongoose
     console.log("DB connected");
   });
 
-const setCounter = async name => {
+const setCounter = async (name, seed) => {
   try {
-    const doc = await Counter.create({ _id: name });
+    const doc = await Counter.create({ _id: name, seq: seed });
     console.log(doc);
   } catch (err) {
     console.log(err);
@@ -40,11 +40,11 @@ const createAdmin = async (name, email, password) => {
 };
 
 if (process.argv[2] === "--setcounter") {
-  setCounter(process.argv[3]);
+  setCounter(process.argv[3], process.argv[4]);
 }
 if (process.argv[2] === "--createadmin") {
   createAdmin(process.argv[3], process.argv[4], process.argv[5]);
 }
 
-// node dev-data/setup --setcounter tempID --setup command
+// node dev-data/setup --setcounter tempID 5000 --setup command
 // node dev-data/setup --createadmin admin admin@test.com qwerty123
