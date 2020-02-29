@@ -131,7 +131,7 @@ exports.regStats = catchAsync(async (req, res, next) => {
   const stats = await User.find({ role: "core-team" });
   let newStats = [];
   for (i = 0; i < stats.length; i++) {
-    const reg = await Registration.find({ approvedBy: stats[i], type: "solo" });
+    const reg = await Registration.find({ approvedBy: stats[i], type: "sole" });
     const teamReg = await Registration.find({
       approvedBy: stats[i],
       type: "team"
