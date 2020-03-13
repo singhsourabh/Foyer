@@ -3,7 +3,7 @@ const Counter = require("./../models/counter");
 const User = require("./../models/userModel");
 
 mongoose
-  .connect("mongodb://localhost:27017/foyer", {
+  .connect("mongodb://mongo:27017/foyer", {
     useUnifiedTopology: true,
     useNewUrlParser: true,
     useCreateIndex: true,

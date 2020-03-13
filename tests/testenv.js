@@ -1,5 +1,5 @@
 process.env.NODE_ENV = "test";
-process.env.DB = "mongodb://localhost:27017/foyer";
+process.env.DB = "mongodb://mongo:27017/foyer-test";
 
 process.env.JWT_SECRET = "sfdgrhyhgrfgt!#$dsrgthtr5y6yuhgfrtrygf$$";
 process.env.JWT_EXPIRES_IN = "1d";
