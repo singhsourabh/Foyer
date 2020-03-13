@@ -184,7 +184,7 @@ exports.entryStats = catchAsync(async (req, res, next) => {
   const registration = await Registration.findOne({
     $or: [{ zealID: tag }, { mobile: Number(tag) || -1 }, { email: tag }],
     zealID: { $ne: null }
-  }).select("name admissionNo email zealID entryLog");
+  }).select("name admissionNo email mobile zealID entryLog");
 
   if (!registration) {
     return next(new AppError("No valid registration found with that tag", 404));
